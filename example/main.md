@@ -1,6 +1,5 @@
 ---
 toc: true
-title: true
 reference-section-title: Список літератури
 
 images-scale: 0.9
