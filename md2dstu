@@ -1,0 +1,83 @@
+#!/bin/bash
+
+show_help() {
+cat << EOF
+Usage: $md2dstu [-hv] [-o OUTPUT_PDF] [-b BIBLIOGRAPHY] [-t TITLE_TEX] MARKDOWN_FILE
+Compile .md files to DSTU looking pdf docs
+    -h          display this help and exit
+    -v          verbose mode
+    -b          bibliography file (.bib format)
+    -t          custom title page (.tex format)
+    -o          path to output pdf file
+EOF
+}
+
+
+MD_FILE=
+TITLE_TEX=
+BIBLIOGRAPHY=
+VERBOSE=0
+OUT_PDF=out.pdf
+
+OPTIND=1
+# Resetting OPTIND is necessary if getopts was used previously in the script.
+# It is a good idea to make OPTIND local if you process options in a function.
+
+while getopts vhb:o:t: opt; do
+    case $opt in
+        h)
+            show_help
+            exit 0
+            ;;
+        v)  VERBOSE=$((VERBOSE+1))
+            ;;
+        o)  OUT_PDF=${OPTARG:-out.pdf}
+            ;;
+        b)  BIBLIOGRAPHY=$OPTARG
+            ;;
+        t)  TITLE_TEX=$OPTARG
+            ;;
+        *)
+            show_help >&2
+            exit 1
+            ;;
+    esac
+done
+shift "$((OPTIND-1))"   # Discard the options and sentinel --
+
+
+if [ $# -eq 1 ]
+then
+    MD_FILE=$1
+else
+    show_help
+    exit 0
+fi
+
+if [ -z $BIBLIOGRAPHY ]
+then
+    BIBLIOGRAPHY=
+else
+    BIBLIOGRAPHY="--bibliography=input_files/$BIBLIOGRAPHY"
+fi
+
+if [ -z $TITLE_TEX ]
+then
+    TITLE_TEX=
+else
+    TITLE_TEX="--include-before-body=input_files/$TITLE_TEX"
+fi
+
+if [ $VERBOSE -ge 1 ]
+then
+    VERBOSE=--verbose
+else
+    VERBOSE=
+fi
+
+
+docker run --rm -v @install_path@:/data -v `pwd`:/data/input_files vangaa/ms-fonts-pandoc:latest input_files/$MD_FILE \
+    --filter pandoc-citeproc --top-level-division=chapter -o "input_files/$OUT_PDF" \
+    --from markdown+table_captions+multiline_tables+header_attributes+fancy_lists \
+    --listings --template template.tex --latex-engine=xelatex --csl=dstu-references.csl \
+    $TITLE_TEX $BIBLIOGRAPHY $VERBOSE
