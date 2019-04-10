@@ -1,0 +1,206 @@
+\documentclass[oneside,a4paper,final,14pt]{extreport}
+
+
+% шрифты
+\usepackage{fontspec}
+\usepackage[T2A]{fontenc}
+\usepackage{cmap}
+
+% цвета
+\usepackage[table,x11names,dvipsnames,table]{xcolor}
+
+% ставим Times New Roman как основной шрифт
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{Times New Roman}
+\newfontfamily\cyrillicfont{Times New Roman}
+\setmonofont{FreeMono} % Моноширинный шрифт для оформления кода
+
+% фичи для украинского языка
+\usepackage{polyglossia}
+\setmainlanguage{ukrainian}
+
+% размеры страницы
+\usepackage{geometry}
+\geometry{left=2cm}
+\geometry{right=1.5cm}
+\geometry{top=2cm}
+\geometry{bottom=2cm}
+
+% добавляем отступы для первого параграфа
+\usepackage{indentfirst}
+
+% отступы параграфов, переносыб межстрочные интервалы
+\usepackage[nodisplayskipstretch]{setspace}
+\onehalfspacing
+\parindent 1.25cm
+\sloppy
+\frenchspacing
+\hyphenpenalty=1000
+\clubpenalty=10000
+\widowpenalty=10000
+
+
+% chapter в содержании uppercase-ом
+\usepackage{textcase}
+\usepackage{hyperref}
+
+\makeatletter
+\let\oldcontentsline\contentsline
+\def\contentsline#1#2{%
+  \expandafter\ifx\csname l@#1\endcsname\l@chapter
+    \expandafter\@firstoftwo
+  \else
+    \expandafter\@secondoftwo
+  \fi
+  {%
+    \oldcontentsline{#1}{\MakeTextUppercase{#2}}%
+  }{%
+    \oldcontentsline{#1}{#2}%
+  }%
+}
+\makeatother
+
+% математика
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{icomma}
+
+% блоки с исходным кодом
+\usepackage{listings}
+\newcommand{\passthrough}[1]{#1}
+\lstset{
+    basicstyle=\small\ttfamily, % Размер и тип шрифта
+    breaklines=true,            % Перенос строк
+    tabsize=2,                  % Размер табуляции
+    frame=single,               % Рамка
+    literate={--}{{-{}-}}2,     % Корректно отображать двойной дефис
+    literate={---}{{-{}-{}-}}3  % Корректно отображать тройной дефис
+}
+
+% списки
+\usepackage{enumerate}
+\usepackage{enumitem}
+\makeatletter\AddEnumerateCounter{\asbuk}{\@asbuk}{м)}
+\makeatother
+\setlist{nolistsep}
+\setlist[itemize]{leftmargin=18mm}
+\setlist[itemize, 2]{leftmargin=6mm}
+\setlist[itemize, 3]{leftmargin=6mm}
+\setlist[enumerate]{leftmargin=19mm}
+\setlist[enumerate, 2]{leftmargin=7mm}
+\setlist[enumerate, 3]{leftmargin=6mm}
+\renewcommand{\labelitemi}{--}
+\renewcommand{\labelitemii}{--}
+\renewcommand{\labelitemiii}{--}
+\renewcommand{\labelenumi}{\asbuk{enumi})}
+\renewcommand{\labelenumii}{\arabic{enumii})}
+\renewcommand{\labelenumiii}{--}
+
+% номер страницы сверху справа
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
+\setlength{\headheight}{30pt}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \rhead{\thepage}
+}
+
+% заголовки
+\usepackage{titlesec}
+
+\titleformat{\chapter}
+    {\centering\normalfont\large\bfseries}
+    {\thechapter.}
+    {0.5em}
+    {\MakeUppercase}
+
+\titleformat{\section}
+    {\normalsize\large\bfseries}
+    {\thesection}
+    {0.5em}
+    {}
+
+\titleformat{\subsection}
+    {\normalsize\bfseries}
+    {\thesubsection}
+    {0.5em}
+    {}
+
+\titlespacing*{\chapter}{0pt}{-30pt}{*4}
+\titlespacing*{\section}{\parindent}{*4}{*4}
+\titlespacing*{\subsection}{\parindent}{0pt}{0pt}
+
+
+% картинки и таблицы
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{float}
+
+\makeatletter
+\let\oldfigure\figure
+\def\figure{\oldfigure[H]}
+
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+
+\setkeys{Gin}{width=$images-scale$\maxwidth,height=$images-scale$\maxheight,keepaspectratio}
+
+
+\usepackage[tableposition=top]{caption}
+\usepackage{subcaption}
+\DeclareCaptionLabelFormat{gostfigure}{Рисунок #2}
+\DeclareCaptionLabelFormat{gosttable}{Таблиця #2}
+\DeclareCaptionLabelSeparator{gost}{~--~}
+\captionsetup{labelsep=gost}
+\captionsetup[figure]{labelformat=gostfigure}
+\captionsetup[table]{labelformat=gosttable}
+\renewcommand{\thesubfigure}{\asbuk{subfigure}}
+
+
+% биболиография
+\usepackage{hyperref}
+\usepackage[
+    citestyle=numeric-comp,
+    style=numeric,
+    autocite=inline
+]{biblatex}
+
+
+% pandoc
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+\let\oldenumerate\enumerate
+\renewcommand{\enumerate} {
+    \oldenumerate
+}
+
+\let\olditemize\itemize
+\renewcommand{\itemize} {
+    \olditemize
+}
+
+\begin{document}
+
+
+$if(include-before)$
+    $include-before$
+$endif$
+
+$if(toc)$
+    \tableofcontents
+    \clearpage
+$endif$
+
+$body$
+
+\end{document}
