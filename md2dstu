@@ -2,11 +2,12 @@
 
 show_help() {
 cat << EOF
-Usage: $md2dstu [-hv] [-o OUTPUT_PDF] [-b BIBLIOGRAPHY] [-t TITLE_TEX] MARKDOWN_FILE
+Usage: $md2dstu [-hvc] [-o OUTPUT_PDF] [-b BIBLIOGRAPHY] [-t TITLE_TEX] MARKDOWN_FILE
 Compile .md files to DSTU looking pdf docs
     -h          display this help and exit
     -v          verbose mode
     -b          bibliography file (.bib format)
+    -c          use chapter level division
     -t          custom title page (.tex format)
     -o          path to output pdf file
 EOF
@@ -16,6 +17,7 @@ EOF
 MD_FILE=
 TITLE_TEX=
 BIBLIOGRAPHY=
+USE_CHAPTER_DIVISION=0
 VERBOSE=0
 OUT_PDF=out.pdf
 
@@ -23,7 +25,7 @@ OPTIND=1
 # Resetting OPTIND is necessary if getopts was used previously in the script.
 # It is a good idea to make OPTIND local if you process options in a function.
 
-while getopts vhb:o:t: opt; do
+while getopts vhcb:o:t: opt; do
     case $opt in
         h)
             show_help
@@ -31,7 +33,9 @@ while getopts vhb:o:t: opt; do
             ;;
         v)  VERBOSE=$((VERBOSE+1))
             ;;
-        o)  OUT_PDF=${OPTARG:-out.pdf}
+        c)  USE_CHAPTER_DIVISION=$((USE_CHAPTER_DIVISION+1))
+            ;;
+        o)  OUT_PDF=$OPTARG
             ;;
         b)  BIBLIOGRAPHY=$OPTARG
             ;;
@@ -75,9 +79,18 @@ else
     VERBOSE=
 fi
 
+if [ $USE_CHAPTER_DIVISION -ge 1 ]
+then
+    MAP_ARG=reporttype:extreport
+    LEVEL_DIVISION=chapter
+else
+    MAP_ARG=reporttype:extarticle
+    LEVEL_DIVISION=section
+fi
+
 
 docker run --rm -v @install_path@:/data -v `pwd`:/data/input_files vangaa/ms-fonts-pandoc:latest input_files/$MD_FILE \
-    --filter pandoc-citeproc --top-level-division=chapter -o "input_files/$OUT_PDF" \
+    --filter pandoc-citeproc --top-level-division=$LEVEL_DIVISION -M $MAP_ARG -o "input_files/$OUT_PDF" \
     --from markdown+table_captions+multiline_tables+header_attributes+fancy_lists \
     --listings --template template.tex --latex-engine=xelatex --csl=dstu-references.csl \
     $TITLE_TEX $BIBLIOGRAPHY $VERBOSE

@@ -1,4 +1,4 @@
-\documentclass[oneside,a4paper,final,14pt]{extreport}
+\documentclass[oneside,a4paper,final,14pt]{$reporttype$}
 
 
 % шрифты
@@ -69,7 +69,7 @@
 \usepackage{listings}
 \newcommand{\passthrough}[1]{#1}
 \lstset{
-    basicstyle=\small\ttfamily, % Размер и тип шрифта
+    basicstyle=\footnotesize\ttfamily, % Размер и тип шрифта
     breaklines=true,            % Перенос строк
     tabsize=2,                  % Размер табуляции
     frame=single,               % Рамка
@@ -112,27 +112,46 @@
 % заголовки
 \usepackage{titlesec}
 
-\titleformat{\chapter}
-    {\centering\normalfont\large\bfseries}
-    {\thechapter.}
-    {0.5em}
-    {\MakeUppercase}
 
-\titleformat{\section}
-    {\normalsize\large\bfseries}
-    {\thesection}
-    {0.5em}
-    {}
 
-\titleformat{\subsection}
-    {\normalsize\bfseries}
-    {\thesubsection}
-    {0.5em}
-    {}
+\expandafter\ifstrequal\expandafter{$reporttype$}{extreport} {
+    \titleformat{\chapter}
+        {\centering\normalfont\large\bfseries}
+        {\thechapter.}
+        {0.5em}
+        {\MakeUppercase}
 
-\titlespacing*{\chapter}{0pt}{-30pt}{*4}
-\titlespacing*{\section}{\parindent}{*4}{*4}
-\titlespacing*{\subsection}{\parindent}{0pt}{0pt}
+    \titleformat{\section}
+        {\normalsize\large\bfseries}
+        {\thesection}
+        {0.5em}
+        {}
+
+    \titleformat{\subsection}
+        {\normalsize\bfseries}
+        {\thesubsection}
+        {0.5em}
+        {}
+
+    \titlespacing*{\chapter}{0pt}{-30pt}{*4}
+    \titlespacing*{\section}{\parindent}{*4}{*4}
+    \titlespacing*{\subsection}{\parindent}{0pt}{0pt} 
+}{
+    \titleformat{\section}
+        {\normalsize\large\bfseries}
+        {\thesection.}
+        {0.5em}
+        {}
+
+    \titleformat{\subsection}
+        {\normalsize\bfseries}
+        {\thesubsection}
+        {0.5em}
+        {}
+
+    \titlespacing*{\section}{\parindent}{*4}{*4}
+    \titlespacing*{\subsection}{\parindent}{0pt}{0pt}   
+}
 
 
 % картинки и таблицы
